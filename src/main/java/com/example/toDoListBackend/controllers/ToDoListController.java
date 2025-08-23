@@ -1,0 +1,50 @@
+package com.example.toDoListBackend.controllers;
+
+import com.example.toDoListBackend.models.ToDoItem;
+import com.example.toDoListBackend.services.ToDoItemService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/Todo")
+@CrossOrigin(origins = "http://localhost:4200")
+public class ToDoListController {
+
+    @Autowired
+    private ToDoItemService toDoItemService;
+
+
+    @GetMapping("/getTodoItems")
+    public ResponseEntity<List<ToDoItem>> getTodoItems(){
+        List<ToDoItem> toDoItems = toDoItemService.getAllTodoItems();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(toDoItems);
+    }
+
+
+    @PostMapping("/saveTodoItem")
+    public ResponseEntity<List<ToDoItem>> saveTodoItem(@RequestBody String toDoTitle) {
+        List<ToDoItem> toDoItems = toDoItemService.saveTodoItem(toDoTitle);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(toDoItems);
+    }
+
+    @DeleteMapping("/deleteTodoItem/{id}")
+    public ResponseEntity<List<ToDoItem>>  deleteTodoItem(@PathVariable Long id) {
+        List<ToDoItem> toDoItems = toDoItemService.deleteTodoItemById(id); // delete from DB
+      return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(toDoItems);
+    }
+}
+
+
+
+
+
