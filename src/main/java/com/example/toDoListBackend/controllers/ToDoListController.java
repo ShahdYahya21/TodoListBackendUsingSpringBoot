@@ -37,11 +37,30 @@ public class ToDoListController {
 
     @DeleteMapping("/deleteTodoItem/{id}")
     public ResponseEntity<List<ToDoItem>>  deleteTodoItem(@PathVariable Long id) {
-        List<ToDoItem> toDoItems = toDoItemService.deleteTodoItemById(id); // delete from DB
+        List<ToDoItem> toDoItems = toDoItemService.deleteTodoItemById(id);
       return ResponseEntity
             .status(HttpStatus.OK)
             .body(toDoItems);
     }
+
+    @PutMapping("/toggleCompletionStatus/{id}")
+    public ResponseEntity<List<ToDoItem>> toggleCompletionStatus(@PathVariable Long id) {
+        List<ToDoItem> toDoItems = toDoItemService.toggleCompletionStatusById(id);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(toDoItems);
+    }
+
+    @PutMapping("/updateTodoItem/{id}")
+    public ResponseEntity<List<ToDoItem>> updateTodoItem(@PathVariable Long id ,@RequestBody String toDoTitle) {
+        List<ToDoItem> toDoItems = toDoItemService.updateTodoItemTitle(id, toDoTitle);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(toDoItems);
+    }
+
+
+
 }
 
 

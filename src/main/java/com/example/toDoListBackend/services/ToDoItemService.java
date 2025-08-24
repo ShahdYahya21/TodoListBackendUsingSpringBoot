@@ -9,4 +9,6 @@ public interface ToDoItemService {
     List<ToDoItem> getAllTodoItems();
     List<ToDoItem> saveTodoItem(String toDoTitle);
     List<ToDoItem> deleteTodoItemById(Long id);
+    List<ToDoItem> toggleCompletionStatusById(Long id);
+    List<ToDoItem> updateTodoItemTitle(Long id, String title);
 }
