@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -59,7 +60,20 @@ public class ToDoListController {
                 .body(toDoItems);
     }
 
+    @GetMapping("/searchForTodoItem")
+    public ResponseEntity<List<ToDoItem>> searchForTodoItem(@RequestParam(required = false) String task) {
+        if (task == null || task.trim().isEmpty()) {
+            List<ToDoItem> allToDoItems = toDoItemService.getAllTodoItems();
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(allToDoItems);
+        }
 
+        List<ToDoItem> toDoItems = toDoItemService.getFilteredTodoItems(task);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(toDoItems);
+    }
 
 }
 

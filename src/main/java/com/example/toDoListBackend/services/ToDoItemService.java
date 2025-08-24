@@ -11,4 +11,5 @@ public interface ToDoItemService {
     List<ToDoItem> deleteTodoItemById(Long id);
     List<ToDoItem> toggleCompletionStatusById(Long id);
     List<ToDoItem> updateTodoItemTitle(Long id, String title);
+    List<ToDoItem> getFilteredTodoItems(String toDoTitle);
 }

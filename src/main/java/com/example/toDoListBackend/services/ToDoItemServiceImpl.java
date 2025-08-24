@@ -66,6 +66,12 @@ public class ToDoItemServiceImpl implements ToDoItemService {
         toDoItemRepository.save(toDoItem);
         return toDoItemRepository.findAll(Sort.by(Sort.Order.asc("id")));
     }
+
+    @Override
+    public List<ToDoItem> getFilteredTodoItems(String toDoTitle) {
+        return toDoItemRepository.findByTaskTitleStartingWith(toDoTitle.trim().toLowerCase());
+
+    }
 }
 
 
