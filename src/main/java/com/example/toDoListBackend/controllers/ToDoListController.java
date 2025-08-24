@@ -1,7 +1,9 @@
 package com.example.toDoListBackend.controllers;
 
+import com.example.toDoListBackend.dtos.ToDoItemDTO;
 import com.example.toDoListBackend.models.ToDoItem;
 import com.example.toDoListBackend.services.ToDoItemService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +22,8 @@ public class ToDoListController {
 
 
     @GetMapping("/getTodoItems")
-    public ResponseEntity<List<ToDoItem>> getTodoItems(){
-        List<ToDoItem> toDoItems = toDoItemService.getAllTodoItems();
+    public ResponseEntity<List<ToDoItemDTO>> getTodoItems(){
+        List<ToDoItemDTO> toDoItems = toDoItemService.getAllTodoItems();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(toDoItems);
@@ -29,47 +31,47 @@ public class ToDoListController {
 
 
     @PostMapping("/saveTodoItem")
-    public ResponseEntity<List<ToDoItem>> saveTodoItem(@RequestBody String toDoTitle) {
-        List<ToDoItem> toDoItems = toDoItemService.saveTodoItem(toDoTitle);
+    public ResponseEntity<List<ToDoItemDTO>> saveTodoItem(@RequestBody @Valid ToDoItemDTO toDoItemDTO) {
+        List<ToDoItemDTO> toDoItems = toDoItemService.saveTodoItem(toDoItemDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(toDoItems);
     }
 
     @DeleteMapping("/deleteTodoItem/{id}")
-    public ResponseEntity<List<ToDoItem>>  deleteTodoItem(@PathVariable Long id) {
-        List<ToDoItem> toDoItems = toDoItemService.deleteTodoItemById(id);
+    public ResponseEntity<List<ToDoItemDTO>>  deleteTodoItem(@PathVariable Long id) {
+        List<ToDoItemDTO> toDoItems = toDoItemService.deleteTodoItemById(id);
       return ResponseEntity
             .status(HttpStatus.OK)
             .body(toDoItems);
     }
 
     @PutMapping("/toggleCompletionStatus/{id}")
-    public ResponseEntity<List<ToDoItem>> toggleCompletionStatus(@PathVariable Long id) {
-        List<ToDoItem> toDoItems = toDoItemService.toggleCompletionStatusById(id);
+    public ResponseEntity<List<ToDoItemDTO>> toggleCompletionStatus(@PathVariable Long id) {
+        List<ToDoItemDTO> toDoItems = toDoItemService.toggleCompletionStatusById(id);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(toDoItems);
     }
 
-    @PutMapping("/updateTodoItem/{id}")
-    public ResponseEntity<List<ToDoItem>> updateTodoItem(@PathVariable Long id ,@RequestBody String toDoTitle) {
-        List<ToDoItem> toDoItems = toDoItemService.updateTodoItemTitle(id, toDoTitle);
+    @PutMapping("/updateTodoItem")
+    public ResponseEntity<List<ToDoItemDTO>> updateTodoItem(@RequestBody @Valid ToDoItemDTO toDoItemDTO) {
+        List<ToDoItemDTO> toDoItems = toDoItemService.updateTodoItemTitle(toDoItemDTO);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(toDoItems);
     }
 
     @GetMapping("/searchForTodoItem")
-    public ResponseEntity<List<ToDoItem>> searchForTodoItem(@RequestParam(required = false) String task) {
+    public ResponseEntity<List<ToDoItemDTO>> searchForTodoItem(@RequestParam(required = false) String task) {
         if (task == null || task.trim().isEmpty()) {
-            List<ToDoItem> allToDoItems = toDoItemService.getAllTodoItems();
+            List<ToDoItemDTO> allToDoItems = toDoItemService.getAllTodoItems();
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(allToDoItems);
         }
 
-        List<ToDoItem> toDoItems = toDoItemService.getFilteredTodoItems(task);
+        List<ToDoItemDTO> toDoItems = toDoItemService.getFilteredTodoItems(task);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(toDoItems);

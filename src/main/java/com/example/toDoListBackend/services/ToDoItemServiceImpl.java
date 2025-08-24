@@ -1,15 +1,18 @@
 package com.example.toDoListBackend.services;
 
+import com.example.toDoListBackend.dtos.ToDoItemDTO;
 import com.example.toDoListBackend.models.ToDoItem;
 import com.example.toDoListBackend.repositories.ToDoItemRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-
+import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class ToDoItemServiceImpl implements ToDoItemService {
@@ -17,62 +20,57 @@ public class ToDoItemServiceImpl implements ToDoItemService {
     @Autowired
     private ToDoItemRepository toDoItemRepository;
 
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
-    public List<ToDoItem> getAllTodoItems() {
-        return toDoItemRepository.findAll(Sort.by(Sort.Order.asc("id")));
+    public List<ToDoItemDTO> getAllTodoItems() {
+        List<ToDoItem> toDoItems = toDoItemRepository.findAll(Sort.by(Sort.Order.asc("id")));
+        return toDoItems.stream()
+                .map(toDoItem -> modelMapper.map(toDoItem, ToDoItemDTO.class))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<ToDoItem> saveTodoItem(String toDoTitle) {
-        ToDoItem toDoItem = new ToDoItem();
-        toDoItem.setTaskTitle(toDoTitle);
-        toDoItem.setCompleted(false);
-        toDoItemRepository.save(toDoItem);
-        return toDoItemRepository.findAll(Sort.by(Sort.Order.asc("id")));
-
+    public List<ToDoItemDTO> saveTodoItem(ToDoItemDTO toDoItemDTO) {
+        ToDoItem toDoItem = modelMapper.map(toDoItemDTO, ToDoItem.class);
+        toDoItem = toDoItemRepository.save(toDoItem);
+        return getAllTodoItems();
     }
 
     @Override
-    public List<ToDoItem> deleteTodoItemById(Long id) {
-        if(toDoItemRepository.existsById(id)) {
+    public List<ToDoItemDTO> deleteTodoItemById(Long id) {
+        if (toDoItemRepository.existsById(id)) {
             toDoItemRepository.deleteById(id);
         } else {
             throw new EntityNotFoundException("Todo item with ID " + id + " not found");
         }
-        return toDoItemRepository.findAll(Sort.by(Sort.Order.asc("id")));
-
+        return getAllTodoItems();
     }
 
     @Override
-    public List<ToDoItem> toggleCompletionStatusById(Long id) {
-        ToDoItem todoItem = toDoItemRepository.findById(id).orElse(null);
-        if (todoItem != null) {
-            todoItem.setCompleted(!todoItem.getCompleted());
-            toDoItemRepository.save(todoItem);
-            return toDoItemRepository.findAll(Sort.by(Sort.Order.asc("id")));  // Ensure order by id
-        } else {
-            throw new RuntimeException("ToDoItem with id " + id + " not found.");
-        }
+    public List<ToDoItemDTO> toggleCompletionStatusById(Long id) {
+        ToDoItem todoItem = toDoItemRepository.findById(id).orElseThrow(() ->
+                new RuntimeException("ToDoItem with id " + id + " not found."));
+        todoItem.setCompleted(!todoItem.getCompleted());
+        toDoItemRepository.save(todoItem);
+        return getAllTodoItems();
     }
 
-    public List<ToDoItem> updateTodoItemTitle(Long id, String title) {
-        ToDoItem toDoItem = toDoItemRepository.findById(id).orElse(null);
-
-        if (toDoItem == null) {
-            throw new RuntimeException("ToDoItem with id " + id + " not found.");
-        }
-        toDoItem.setTaskTitle(title);
+    @Override
+    public List<ToDoItemDTO> updateTodoItemTitle(ToDoItemDTO toDoItemDTO) {
+        ToDoItem toDoItem = toDoItemRepository.findById(toDoItemDTO.getId()).orElseThrow(() ->
+                new RuntimeException("ToDoItem with id " + toDoItemDTO.getId() + " not found."));
+        toDoItem.setTaskTitle(toDoItemDTO.getTaskTitle());
         toDoItemRepository.save(toDoItem);
-        return toDoItemRepository.findAll(Sort.by(Sort.Order.asc("id")));
+        return getAllTodoItems();
     }
 
     @Override
-    public List<ToDoItem> getFilteredTodoItems(String toDoTitle) {
-        return toDoItemRepository.findByTaskTitleStartingWith(toDoTitle.trim().toLowerCase());
-
+    public List<ToDoItemDTO> getFilteredTodoItems(String toDoTitle) {
+        List<ToDoItem> toDoItems = toDoItemRepository.findByTaskTitleStartingWith(toDoTitle.trim().toLowerCase());
+        return toDoItems.stream()
+                .map(toDoItem -> modelMapper.map(toDoItem, ToDoItemDTO.class))
+                .collect(Collectors.toList());
     }
 }
-
-
-

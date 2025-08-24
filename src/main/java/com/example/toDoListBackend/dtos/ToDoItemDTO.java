@@ -1,25 +1,24 @@
-package com.example.toDoListBackend.models;
-import jakarta.persistence.*;
+package com.example.toDoListBackend.dtos;
+
+
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 
-@Entity
-@Builder
-@Table(name = "todo_list")
-public class ToDoItem {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ToDoItemDTO {
+
     private Long id;
 
+    @NotNull(message = "Task title cannot be null")
+    @Size(min = 3, max = 255, message = "Task title must be between 3 and 255 characters")
     private String taskTitle;
+
     private Boolean completed;
-
-    public ToDoItem() {
+    public ToDoItemDTO() {
     }
-
-
-    public ToDoItem(Long id, String taskTitle, Boolean completed) {
+    public ToDoItemDTO(Long id, String taskTitle, Boolean completed) {
         this.id = id;
         this.taskTitle = taskTitle;
         this.completed = completed;
@@ -48,5 +47,4 @@ public class ToDoItem {
     public void setCompleted(Boolean completed) {
         this.completed = completed;
     }
-
 }

@@ -1,15 +1,16 @@
 package com.example.toDoListBackend.services;
 
+import com.example.toDoListBackend.dtos.ToDoItemDTO;
 import com.example.toDoListBackend.models.ToDoItem;
 
 import java.util.List;
 
 public interface ToDoItemService {
 
-    List<ToDoItem> getAllTodoItems();
-    List<ToDoItem> saveTodoItem(String toDoTitle);
-    List<ToDoItem> deleteTodoItemById(Long id);
-    List<ToDoItem> toggleCompletionStatusById(Long id);
-    List<ToDoItem> updateTodoItemTitle(Long id, String title);
-    List<ToDoItem> getFilteredTodoItems(String toDoTitle);
+    List<ToDoItemDTO> getAllTodoItems();
+    List<ToDoItemDTO> saveTodoItem(ToDoItemDTO toDoItemDTO);
+    List<ToDoItemDTO> deleteTodoItemById(Long id);
+    List<ToDoItemDTO> toggleCompletionStatusById(Long id);
+    List<ToDoItemDTO> updateTodoItemTitle(ToDoItemDTO toDoItemDTO);
+    List<ToDoItemDTO> getFilteredTodoItems(String toDoTitle);
 }
