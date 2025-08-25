@@ -6,13 +6,13 @@ import com.example.toDoListBackend.repositories.ToDoItemRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Component
 @Slf4j
 public class ToDoItemServiceImpl implements ToDoItemService {
@@ -23,19 +23,24 @@ public class ToDoItemServiceImpl implements ToDoItemService {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Override
-    public List<ToDoItemDTO> getAllTodoItems() {
-        List<ToDoItem> toDoItems = toDoItemRepository.findAll(Sort.by(Sort.Order.asc("id")));
+    private List<ToDoItemDTO> convertToDTOList(List<ToDoItem> toDoItems) {
         return toDoItems.stream()
                 .map(toDoItem -> modelMapper.map(toDoItem, ToDoItemDTO.class))
                 .collect(Collectors.toList());
     }
 
     @Override
+    public List<ToDoItemDTO> getAllTodoItems() {
+        List<ToDoItem> toDoItems = toDoItemRepository.findAll(Sort.by(Sort.Order.asc("id")));
+        return convertToDTOList(toDoItems);
+    }
+
+    @Override
     public List<ToDoItemDTO> saveTodoItem(ToDoItemDTO toDoItemDTO) {
         ToDoItem toDoItem = modelMapper.map(toDoItemDTO, ToDoItem.class);
-        toDoItem = toDoItemRepository.save(toDoItem);
-        return getAllTodoItems();
+        toDoItemRepository.save(toDoItem);
+        List<ToDoItem> toDoItems = toDoItemRepository.findAll(Sort.by(Sort.Order.asc("id")));
+        return convertToDTOList(toDoItems);
     }
 
     @Override
@@ -45,7 +50,8 @@ public class ToDoItemServiceImpl implements ToDoItemService {
         } else {
             throw new EntityNotFoundException("Todo item with ID " + id + " not found");
         }
-        return getAllTodoItems();
+        List<ToDoItem> toDoItems = toDoItemRepository.findAll(Sort.by(Sort.Order.asc("id")));
+        return convertToDTOList(toDoItems);
     }
 
     @Override
@@ -54,7 +60,8 @@ public class ToDoItemServiceImpl implements ToDoItemService {
                 new RuntimeException("ToDoItem with id " + id + " not found."));
         todoItem.setCompleted(!todoItem.getCompleted());
         toDoItemRepository.save(todoItem);
-        return getAllTodoItems();
+        List<ToDoItem> toDoItems = toDoItemRepository.findAll(Sort.by(Sort.Order.asc("id")));
+        return convertToDTOList(toDoItems);
     }
 
     @Override
@@ -63,14 +70,13 @@ public class ToDoItemServiceImpl implements ToDoItemService {
                 new RuntimeException("ToDoItem with id " + toDoItemDTO.getId() + " not found."));
         toDoItem.setTaskTitle(toDoItemDTO.getTaskTitle());
         toDoItemRepository.save(toDoItem);
-        return getAllTodoItems();
+        List<ToDoItem> toDoItems = toDoItemRepository.findAll(Sort.by(Sort.Order.asc("id")));
+        return convertToDTOList(toDoItems);
     }
 
     @Override
     public List<ToDoItemDTO> getFilteredTodoItems(String toDoTitle) {
         List<ToDoItem> toDoItems = toDoItemRepository.findByTaskTitleStartingWith(toDoTitle.trim().toLowerCase());
-        return toDoItems.stream()
-                .map(toDoItem -> modelMapper.map(toDoItem, ToDoItemDTO.class))
-                .collect(Collectors.toList());
+        return convertToDTOList(toDoItems);
     }
 }
